@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>vue--TodoList</title>
+  <script src="js/vue.js"></script>
+</head>
+<body>
+<div id="root">
+  <div>
+    <div>
+      <input v-model="inputValue"/>
+      <button @click="handleSubmit">提交</button>
+    </div>
+    <ul>
+      <todo-item-local></todo-item-local>
+      <todo-item-global
+              v-for="(item, index) of list"
+              :key="index"
+              :content="item"
+              :index="index"
+              @delete="handleDelete"
+      ></todo-item-global>
+    </ul>
+  </div>
+</div>
+<p>@delete="handleDelete" 父组件监听子组件的delete事件，触发父组件的handleDelete事件</p>
+<p>父组件向子组件传值通过属性形式传值</p>
+<p>子组件要删除就要删除父组件中的数据，点击子组件时要和父组件进行通信，this.$emit</p>
+<script>
+  Vue.component('todo-item-global', {
+    props: ['content', 'index'],
+    template: '<li @click="handleClick">全局组件: {{content}}  --点击删除该行内容  下标: {{index}}</li>',
+    methods: {
+      handleClick: function () {
+        this.content = '替换内容了'
+        this.$emit('delete', this.index)
+      }
+    }
+  })
+
+  var TodoItem = {
+    template: '<li>局部组件</li>'
+  }
+  new Vue({
+    el: '#root',
+    components: {
+      'todo-item-local': TodoItem
+    },
+    data: {
+      inputValue: '',
+      list: []
+    },
+    methods: {
+      handleSubmit: function () {
+        this.list.push(this.inputValue)
+        this.inputValue = ''
+      },
+      handleDelete: function (index) {
+        this.list.splice(index, 1)
+      }
+    }
+  })
+</script>
+</body>
+</html>
